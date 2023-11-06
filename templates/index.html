@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Greygound Guesser</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+	<script src="/htmx.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Greyhound Guesser</h1>
+    </header>
+    <main>
+      <section id="about">
+        <h2>Make prediction</h2>
+        <p>Enter all the following details to receive a prediction.</p>
+      </section>
+      <section>
+        <form hx-post="/submit">
+          <div id="form-wrap">
+            {{ range $i, $e := .TrapNumbers }} {{ template "dog-form" $i }} {{
+            end }}
+          </div>
+          <button role="submit">Submit</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

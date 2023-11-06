@@ -9,3 +9,9 @@ lab:
 	venv/bin/python -m jupyter lab
 
 .PHONY = venv clean-venv lab
+
+build:
+	go buid
+
+run:
+	go run ./bin/server

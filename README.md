@@ -29,3 +29,11 @@ I will just focus on the reduced task of predicting the winner of each race, giv
 ## Other info
 
 - **Data**: training data is taken from [kaggle](https://www.kaggle.com/datasets/davidregan/greyhound-racing-uk-predict-finish-position).
+
+## TODO
+
+- Split training and validation data
+- Check model is creating valid predictions (and that softmax is working properly)
+- Check input data works properly
+- Create webserver for hosting
+
