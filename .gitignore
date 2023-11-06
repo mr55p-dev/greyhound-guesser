@@ -22,4 +22,6 @@ go.work
 
 # Project local
 venv/
+wandb/
 
+**/.ipynb_checkpoints
