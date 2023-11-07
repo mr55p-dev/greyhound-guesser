@@ -1,3 +1,4 @@
+from datetime import datetime
 import sys
 import torch
 from torch import nn
@@ -6,6 +7,8 @@ from tqdm import tqdm, trange
 import wandb
 from src.model import Network
 from src.dataset import GreyhoundDataset
+from src.utils import get_device
+
 
 def train_loop(dataloader, model, loss_func, optimizer, epoch):
     model.train()
@@ -55,13 +58,8 @@ def main():
     )
     print("Starting training session")
 
-    # Backedn
-    device = "cpu"
-    if torch.cuda.is_available():
-        device = "cuda"
-    elif torch.backends.mps.is_available():
-        device = "mps"
-    device = torch.device(device)
+    # Backend
+    device = get_device()
 
     # Data load
     dataset = GreyhoundDataset(device)
@@ -79,7 +77,18 @@ def main():
         train_loop(dataloader, model, loss_func, optimizer, epoch)
         test_loop(dataloader, model, loss_func, epoch)
 
-    print("Done!")
+    # Save
+    ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
+    model_name = f"gg-{ts}.pt"
+    model_path = f"models/{model_name}"
+    torch.save(model, model_path)
+
+    # Save artifact
+    artifact = wandb.Artifact(name=model_name, type="model")
+    artifact.add_file(model_path)
+    wandb.log_artifact(artifact)
+
+
     return 0
 
 

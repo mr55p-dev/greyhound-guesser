@@ -1,7 +1,11 @@
 {{ define "dog-form" }}
 <div class="dog">
 	<p>Dog {{ . }}</p>
-	<label for="dog-{{ . }}-odds">Odds</input>
+	<label for="dog-{{ . }}-odds">odds</input>
 	<input name="dog-{{ . }}-odds" id="dog-{{ . }}-odds" />
+	<label for="dog-{{ . }}-finished">finished</input>
+	<input name="dog-{{ . }}-finished" id="dog-{{ . }}-finished" />
+	<label for="dog-{{ . }}-distance">distance</input>
+	<input name="dog-{{ . }}-distance" id="dog-{{ . }}-distance" />
 </div>
 {{ end }}
