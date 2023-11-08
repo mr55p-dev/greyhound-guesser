@@ -44,16 +44,16 @@ def predict():
     app.logger.debug(f"received form request with fields: \n{request.form}")
     for field in fields:
         if field not in request.form:
-            print("Bad field")
-            print(field)
+            app.logger.debug("Bad field")
+            app.logger.debug(field)
             raise BadFormError()
         form_fields[field] = request.form[field]
 
-    print("Received request with form: ")
-    pprint(form_fields)
+    app.logger.debug("Received request with form: ")
+    app.logger.debug(form_fields)
 
     out = model.predict(form_fields)
-    print("Generated predictions")
-    pprint(out)
+    app.logger.debug("Generated predictions")
+    app.logger.debug(out)
     return out[0, :].tolist()
 

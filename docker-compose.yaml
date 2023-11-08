@@ -1,0 +1,15 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    ports:
+      - "3000:3000"
+  inference:
+    build:
+      context: .
+      dockerfile: inference.Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_DEBUG: true

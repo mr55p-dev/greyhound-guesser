@@ -1,6 +1,6 @@
 jupyterlab
 wandb
-torch="^2.1.0"
+torch
 pandas
 seaborn
 tqdm
