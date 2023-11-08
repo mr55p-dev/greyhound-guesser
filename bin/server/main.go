@@ -2,6 +2,9 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"text/template"
@@ -38,15 +41,41 @@ func main() {
 
 	e.POST("/submit", func(c echo.Context) error {
 		c.Logger().Debug("Submit request received")
+		reqBuf := new(bytes.Buffer)
+		io.Copy(reqBuf, c.Request().Body)
+		reqBody := reqBuf.Bytes()
+		c.Logger().Debugf("Request body: %s", string(reqBody))
+		ctype := c.Request().Header.Get("Content-Type")
+		c.Logger().Debugf("Content type submitted as %s", ctype)
+
+		res, err := http.Post("http://127.0.0.1:5000/predict", ctype, bytes.NewReader(reqBody))
+		if err != nil {
+			return c.String(http.StatusInternalServerError, fmt.Sprintf("Failed to get inference: %s", err.Error()))
+		}
+		c.Logger().Info("Received response from inference server")
+		defer res.Body.Close()
+		resData := new(bytes.Buffer)
+		io.Copy(resData, res.Body)
+		c.Logger().Debug("Copied response body")
+
+		if res.StatusCode != 200 {
+			c.Logger().Warnf("Got bad response %s from inference server", res.Status)
+			return c.String(http.StatusInternalServerError, fmt.Sprintf("Error fetching inference: (%s) %s", res.Status, resData.String()))
+		}
+		out := make([]float32, 5)
+		c.Logger().Debug("Trying to unmarshal response")
+		json.Unmarshal(resData.Bytes(), &out)
+		c.Logger().Debugf("Received response from model server: %v", out)
+
 		html := ReadTemplate(
-			nil,
+			out,
 			"templates/results.html",
 			"templates/common.html",
 		)
 		return c.HTML(http.StatusOK, html)
 	})
 
+	e.Logger.SetLevel(0)
 	log.Fatal(e.Start(":3000"))
 }
 
-curl "http://localhost:5000/predict" --data-raw 'dog-0-odds=1&dog-0-finished=1&dog-0-distance=1&dog-1-odds=1&dog-1-finished=1&dog-1-distance=1&dog-2-odds=1&dog-2-finished=1&dog-2-distance=1&dog-3-odds=1&dog-3-finished=1&dog-3-distance=1&dog-4-odds=1&dog-4-finished=1&dog-4-distance=1&dog-5-odds=1&dog-5-finished=1&dog-5-distance=1'

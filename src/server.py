@@ -2,6 +2,7 @@ from flask import Flask, request
 import numpy as np
 import werkzeug
 import torch
+from pprint import pprint
 
 from src.utils import get_device
 from src.model import Network
@@ -35,10 +36,12 @@ fields.append("race-length")
 
 model = Model()
 app = Flask(__name__)
+app.logger.info("Started app")
 
 @app.route("/predict", methods=["POST"])
 def predict():
     form_fields = {}
+    app.logger.debug(f"received form request with fields: \n{request.form}")
     for field in fields:
         if field not in request.form:
             print("Bad field")
@@ -46,6 +49,11 @@ def predict():
             raise BadFormError()
         form_fields[field] = request.form[field]
 
+    print("Received request with form: ")
+    pprint(form_fields)
+
     out = model.predict(form_fields)
+    print("Generated predictions")
+    pprint(out)
     return out[0, :].tolist()
 

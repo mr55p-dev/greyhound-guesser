@@ -15,6 +15,6 @@ run:
 	go run ./bin/server
 
 model-server:
-	venv/bin/python3 -m flask --app ./src/server run
+	FLASK_DEBUG=1 venv/bin/python3 -m flask --app ./src/server run
 
 .PHONY = init clean-venv lab build run model-archive torch-server

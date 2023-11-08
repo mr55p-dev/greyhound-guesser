@@ -17,6 +17,8 @@
       <section>
         <form hx-post="/submit">
           <div id="form-wrap">
+			<label for="race-length">Distance</input>
+			<input value="380" name="race-length" id="race-length" />
             {{ range $i, $e := .TrapNumbers }} {{ template "dog-form" $i }} {{
             end }}
           </div>

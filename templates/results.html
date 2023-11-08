@@ -1,3 +1,6 @@
 <div>
-  <h1>Not implemented</h1>
+  <h1>Result</h1>
+  {{ range $i, $v := . }}
+  <p>Dog {{ $i }}: {{ $v }}</p>
+  {{ end }}
 </div>
