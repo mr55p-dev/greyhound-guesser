@@ -43,7 +43,7 @@ def main():
     # Hyperparameters
     batch_size = 16
     learning_rate = 1e-3
-    epochs = 5
+    epochs = 500
 
     # Wandb
     wandb.init(
@@ -72,7 +72,7 @@ def main():
 
     # Training loop
     loss_func = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     for epoch in trange(epochs, desc="Epoch", position=0):
         train_loop(dataloader, model, loss_func, optimizer, epoch)
         test_loop(dataloader, model, loss_func, epoch)

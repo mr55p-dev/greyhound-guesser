@@ -6,6 +6,7 @@ class Network(nn.Module):
     GLOBAL_FEATURES = 1
     LAYER_1_NODES = 64
     LAYER_2_NODES = 64
+    LAYER_3_NODES = 64
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -17,8 +18,10 @@ class Network(nn.Module):
             nn.ReLU(),
             nn.Linear(self.LAYER_1_NODES, self.LAYER_2_NODES),
             nn.ReLU(),
-            nn.Linear(self.LAYER_2_NODES, self.N_DOGS),
-            nn.Softmax(dim=0),
+            nn.Linear(self.LAYER_2_NODES, self.LAYER_3_NODES),
+            nn.ReLU(),
+            nn.Linear(self.LAYER_3_NODES, self.N_DOGS),
+            nn.Softmax(dim=1),
         )
         
 

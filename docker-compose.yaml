@@ -9,9 +9,12 @@ services:
     build:
       context: .
       dockerfile: inference.Dockerfile
-      args:
-        TORCH_WEIGHT_PATH: models/2023-11-09_16-35.pt
+    volumes:
+      - type: bind
+        source: models/
+        target: /app/models/
     ports:
       - "5000:5000"
     environment:
       FLASK_DEBUG: true
+      TORCH_WEIGHT_PATH: /app/models/gg-2023-11-09_17-32.pt
