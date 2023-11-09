@@ -46,6 +46,8 @@ def main():
     learning_rate = 1e-4
     epochs = 500
 
+    torch.manual_seed(1)
+
     # Wandb
     wandb.init(
         project="greyhound-guesser",
