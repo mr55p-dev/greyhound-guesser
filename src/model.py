@@ -4,9 +4,9 @@ class Network(nn.Module):
     N_DOGS = 6
     DOG_FEATURES = 3
     GLOBAL_FEATURES = 1
-    LAYER_1_NODES = 64
-    LAYER_2_NODES = 64
-    LAYER_3_NODES = 64
+    LAYER_1_NODES = 256
+    LAYER_2_NODES = 128
+    LAYER_3_NODES = 32
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
