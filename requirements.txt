@@ -1,10 +1,10 @@
 jupyterlab
 wandb
-torch
+torch>=2.1.0
 pandas
 seaborn
 tqdm
 torchserve
 torch-model-archiver 
 torch-workflow-archiver
-flask
+flask>=2.2

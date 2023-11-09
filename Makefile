@@ -12,9 +12,30 @@ build:
 	go buid
 
 run:
-	go run ./bin/server
+	INFERENCE_HOSTNAME=localhost:5000 go run ./bin/server
 
 model-server:
-	FLASK_DEBUG=1 venv/bin/python3 -m flask --app ./src/server run
+	FLASK_DEBUG=1 \
+	FLASK_APP=./src/server \
+	TORCH_WEIGHT_PATH=./models/gg-2023-11-09_16-31.pt \
+	venv/bin/python3 -m flask run \
+	--host=localhost
+
+train:
+	venv/bin/python3 train.py
+
+docker-build-inference:
+	docker build \
+		--build-arg DEBUG=1 \
+		--build-arg \
+		-f inference.Dockerfile \
+		-t gg-inference \
+		.
+
+docker-build-server:
+	docker build \
+		-f server.Dockerifle \
+		-t gg-server \
+		.
 
 .PHONY = init clean-venv lab build run model-archive torch-server

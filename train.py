@@ -81,13 +81,12 @@ def main():
     ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
     model_name = f"gg-{ts}.pt"
     model_path = f"models/{model_name}"
-    torch.save(model, model_path)
+    torch.save(model.state_dict(), model_path)
 
     # Save artifact
-    artifact = wandb.Artifact(name=model_name, type="model")
+    artifact = wandb.Artifact(name=model_name, type="model-state-dict")
     artifact.add_file(model_path)
     wandb.log_artifact(artifact)
-
 
     return 0
 

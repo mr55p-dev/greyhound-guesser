@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 
 	"github.com/labstack/echo"
@@ -26,6 +27,7 @@ func ReadTemplate(data any, files ...string) string {
 }
 
 func main() {
+	inferenceHost := os.Getenv("INFERENCE_HOSTNAME")
 	e := echo.New()
 	e.Logger.Info("Starting server")
 	e.Static("/", "public")
@@ -41,23 +43,34 @@ func main() {
 
 	e.POST("/submit", func(c echo.Context) error {
 		c.Logger().Debug("Submit request received")
+
+		// Load request body
 		reqBuf := new(bytes.Buffer)
 		io.Copy(reqBuf, c.Request().Body)
 		reqBody := reqBuf.Bytes()
+
 		c.Logger().Debugf("Request body: %s", string(reqBody))
 		ctype := c.Request().Header.Get("Content-Type")
 		c.Logger().Debugf("Content type submitted as %s", ctype)
 
-		res, err := http.Post("http://127.0.0.1:5000/predict", ctype, bytes.NewReader(reqBody))
+		// Forward request to inference server
+		res, err := http.Post(
+			fmt.Sprintf("http://%s/predict", inferenceHost),
+			ctype,
+			bytes.NewReader(reqBody),
+		)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, fmt.Sprintf("Failed to get inference: %s", err.Error()))
 		}
+
+		// Decode server response
 		c.Logger().Info("Received response from inference server")
 		defer res.Body.Close()
 		resData := new(bytes.Buffer)
 		io.Copy(resData, res.Body)
 		c.Logger().Debug("Copied response body")
 
+		// Render response
 		if res.StatusCode != 200 {
 			c.Logger().Warnf("Got bad response %s from inference server", res.Status)
 			return c.String(http.StatusInternalServerError, fmt.Sprintf("Error fetching inference: (%s) %s", res.Status, resData.String()))

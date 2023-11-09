@@ -9,6 +9,8 @@ services:
     build:
       context: .
       dockerfile: inference.Dockerfile
+      args:
+        TORCH_WEIGHT_PATH: models/2023-11-09_16-35.pt
     ports:
       - "5000:5000"
     environment:

@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request
 import numpy as np
 import werkzeug
@@ -14,14 +15,20 @@ class BadFormError(werkzeug.exceptions.HTTPException):
 class Model():
     def __init__(self):
         self.device = get_device()
-        network: Network = torch.load("./models/gg-2023-11-07_18-24.pt")
+        
+        weight_path = os.getenv("TORCH_WEIGHT_PATH")
+        if not weight_path:
+            raise OSError("TORCH_WEIGHT_PATH environment variable is missing")
+
+        network = Network()
+        network.load_state_dict(torch.load(weight_path, map_location=self.device))
+        network.to(self.device)
         self.model = network
 
     def predict(self, form):
         input = np.zeros((19, 1), dtype=np.float32)
-        input[0, 0] = form["race-length"]
         for idx, field in enumerate(fields):
-            input[1 + idx, 0] = form[field]
+            input[idx, 0] = form[field]
 
         print("Decoded tensor")
         print(input)
@@ -31,12 +38,15 @@ class Model():
         return pred
 
 labels = ["odds", "distance", "finished"]
-fields = [f"dog-{i}-{j}" for i in range(5) for j in labels] 
-fields.append("race-length")
+fields = ["race-length"] + [f"dog-{i}-{j}" for i in range(5) for j in labels] 
 
 model = Model()
 app = Flask(__name__)
 app.logger.info("Started app")
+
+@app.route("/health", methods=["GET"])
+def health():
+    return "ok"
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -48,9 +58,6 @@ def predict():
             app.logger.debug(field)
             raise BadFormError()
         form_fields[field] = request.form[field]
-
-    app.logger.debug("Received request with form: ")
-    app.logger.debug(form_fields)
 
     out = model.predict(form_fields)
     app.logger.debug("Generated predictions")
