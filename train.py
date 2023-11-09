@@ -3,6 +3,7 @@ import sys
 import torch
 from torch import nn
 from torch.utils.data.dataloader import DataLoader
+from torch.utils.data.dataset import random_split
 from tqdm import tqdm, trange
 import wandb
 from src.model import Network
@@ -42,7 +43,7 @@ def test_loop(dataloader, model, loss_func, epoch):
 def main():
     # Hyperparameters
     batch_size = 16
-    learning_rate = 1e-3
+    learning_rate = 1e-4
     epochs = 500
 
     # Wandb
@@ -63,7 +64,9 @@ def main():
 
     # Data load
     dataset = GreyhoundDataset(device)
-    dataloader = DataLoader(dataset, batch_size, shuffle=True)
+    train_set, test_set = random_split(dataset, [0.9, 0.1])
+    train = DataLoader(train_set, batch_size, shuffle=True)
+    test = DataLoader(test_set, batch_size, shuffle=True)
 
     # Model load
     model = Network().to(device)
@@ -74,8 +77,8 @@ def main():
     loss_func = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     for epoch in trange(epochs, desc="Epoch", position=0):
-        train_loop(dataloader, model, loss_func, optimizer, epoch)
-        test_loop(dataloader, model, loss_func, epoch)
+        train_loop(train, model, loss_func, optimizer, epoch)
+        test_loop(test, model, loss_func, epoch)
 
     # Save
     ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
