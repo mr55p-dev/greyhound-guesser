@@ -3,6 +3,9 @@ services:
     build:
       context: .
       dockerfile: server.Dockerfile
+      platforms:
+        - "linux/amd64"
+        - "linux/arm64"
     image: public.ecr.aws/n7b0m3g0/greyhound-guesser
     ports:
       - "3000:3000"
@@ -11,6 +14,9 @@ services:
     build:
       context: .
       dockerfile: inference.Dockerfile
+      platforms:
+        - "linux/amd64"
+        - "linux/arm64"
     volumes:
       - type: bind
         source: models/
