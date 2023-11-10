@@ -9,9 +9,12 @@ import wandb
 from src.model import Network
 from src.dataset import GreyhoundDataset
 from src.utils import get_device
+from src.metrics import Accuracy, Metric
 
 
-def train_loop(dataloader, model, loss_func, optimizer, epoch):
+def train_loop(
+    dataloader, model, loss_func, optimizer, epoch, metrics: list[Metric] = []
+):
     model.train()
     for batch, (X, Y) in enumerate(
         tqdm(dataloader, desc="Train batch", position=1, leave=False)
@@ -20,36 +23,44 @@ def train_loop(dataloader, model, loss_func, optimizer, epoch):
 
         pred = model.forward(X)
         loss = loss_func(pred, Y)
+        for metric in metrics:
+            metric.log(pred, Y)
 
         loss.backward()
         optimizer.step()
 
+        metric_log = {metric.get_name(): metric.reset() for metric in metrics}
         if batch % 20 == 0:
-            wandb.log({"train_loss": loss, "epoch": epoch})
+            wandb.log(
+                {
+                    "train_loss": loss,
+                    "epoch": epoch,
+                    **metric_log,
+                }
+            )
 
 
-def test_loop(dataloader, model, loss_func, epoch):
+def test_loop(dataloader, model, loss_func, epoch, metrics: list[Metric] = []):
     model.eval()
     err = 0
-    accuracy = 0
+
     with torch.no_grad():
         for X, Y in tqdm(dataloader, desc="Test batch", position=1, leave=False):
             pred = model.forward(X)
             err += loss_func(pred, Y).item()
-            is_correct = torch.eq(
-                torch.argmax(pred, dim=1),
-                torch.argmin(Y, dim=1),
-            )
-            accuracy += torch.nonzero(is_correct).item()
+            for metric in metrics:
+                metric.log(pred, Y)
 
     err /= len(dataloader)
-    accuracy /= len(dataloader)
+    metric_log = {metric.get_name(): metric.reset() for metric in metrics}
 
-    wandb.log({
-        "test_loss": err,
-        "accuracy": accuracy,
-        "epoch": epoch,
-    })
+    wandb.log(
+        {
+            "test_loss": err,
+            "epoch": epoch,
+            **metric_log,
+        }
+    )
 
 
 def main():
@@ -88,12 +99,21 @@ def main():
     print("Created model")
     print(model)
 
+    # Metrics
+    train_metrics: list[Metric] = [
+        Accuracy(len(train), name="train_accuracy"),
+    ]
+
+    test_metrics: list[Metric] = [
+        Accuracy(len(test), name="test_accuracy"),
+    ]
+
     # Training loop
     loss_func = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     for epoch in trange(epochs, desc="Epoch", position=0):
-        train_loop(train, model, loss_func, optimizer, epoch)
-        test_loop(test, model, loss_func, epoch)
+        train_loop(train, model, loss_func, optimizer, epoch, train_metrics)
+        test_loop(test, model, loss_func, epoch, test_metrics)
 
     # Save
     ts = datetime.now().strftime("%Y-%m-%d_%H-%M")
