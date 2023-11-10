@@ -4,7 +4,7 @@ import torch
 from torch import nn
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data.dataset import random_split
-from tqdm import tqdm, trange
+from tqdm import trange
 import wandb
 from src.model import Network
 from src.dataset import GreyhoundDataset, BATCH_SIZE
@@ -16,9 +16,7 @@ def train_loop(
     dataloader, model, loss_func, optimizer, epoch, metrics: list[Metric] = []
 ):
     model.train()
-    for batch, (X, Y) in enumerate(
-        tqdm(dataloader, desc="Train batch", position=1, leave=False)
-    ):
+    for batch, (X, Y) in enumerate(dataloader):
         model.zero_grad()
 
         pred = model.forward(X)
@@ -45,7 +43,7 @@ def test_loop(dataloader, model, loss_func, epoch, metrics: list[Metric] = []):
     err = 0
 
     with torch.no_grad():
-        for X, Y in tqdm(dataloader, desc="Test batch", position=1, leave=False):
+        for X, Y in dataloader:
             pred = model.forward(X)
             err += loss_func(pred, Y).item()
             for metric in metrics:
@@ -65,8 +63,8 @@ def test_loop(dataloader, model, loss_func, epoch, metrics: list[Metric] = []):
 
 def main():
     # Hyperparameters
-    learning_rate = 1e-4
-    epochs = 50
+    learning_rate = 1e-5
+    epochs = 5000
 
     torch.manual_seed(1)
 
