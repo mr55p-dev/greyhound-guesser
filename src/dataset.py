@@ -6,7 +6,7 @@ import pandas as pd
 from pathlib import Path
 
 # Params
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 
 class GreyhoundDataset(Dataset):
     LABEL_COL = "Winner"
