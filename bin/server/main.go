@@ -31,6 +31,7 @@ func main() {
 	e := echo.New()
 	e.Logger.Info("Starting server")
 	e.Static("/", "public")
+
 	e.GET("/", func(c echo.Context) error {
 		c.Logger().Debug("Index request received")
 		html := ReadTemplate(

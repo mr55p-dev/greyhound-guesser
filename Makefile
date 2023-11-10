@@ -1,3 +1,4 @@
+LATEST_MODEL := $(shell echo "models/$(shell ls -Art models | tail -n 1)")
 init:
 	python3 -m venv venv
 	venv/bin/python -m pip install -r requirements.txt
@@ -15,9 +16,10 @@ run:
 	INFERENCE_HOSTNAME=localhost:5000 go run ./bin/server
 
 model-server:
+	echo $(LATEST_MODEL)
 	FLASK_DEBUG=1 \
 	FLASK_APP=./src/server \
-	TORCH_WEIGHT_PATH=./models/gg-2023-11-09_17-32.pt \
+	TORCH_WEIGHT_PATH=$(LATEST_MODEL) \
 	venv/bin/python3 -m flask run \
 	--host=localhost
 
