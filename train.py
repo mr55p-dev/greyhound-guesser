@@ -31,20 +31,32 @@ def train_loop(dataloader, model, loss_func, optimizer, epoch):
 def test_loop(dataloader, model, loss_func, epoch):
     model.eval()
     err = 0
+    accuracy = 0
     with torch.no_grad():
         for X, Y in tqdm(dataloader, desc="Test batch", position=1, leave=False):
             pred = model.forward(X)
             err += loss_func(pred, Y).item()
+            is_correct = torch.eq(
+                torch.argmax(pred, dim=1),
+                torch.argmin(Y, dim=1),
+            )
+            accuracy += torch.nonzero(is_correct).item()
 
     err /= len(dataloader)
-    wandb.log({"test_loss": err, "epoch": epoch})
+    accuracy /= len(dataloader)
+
+    wandb.log({
+        "test_loss": err,
+        "accuracy": accuracy,
+        "epoch": epoch,
+    })
 
 
 def main():
     # Hyperparameters
     batch_size = 32
     learning_rate = 1e-4
-    epochs = 50000
+    epochs = 50
 
     torch.manual_seed(1)
 
