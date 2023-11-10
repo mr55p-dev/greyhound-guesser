@@ -3,9 +3,11 @@ services:
     build:
       context: .
       dockerfile: server.Dockerfile
+    image: public.ecr.aws/n7b0m3g0/greyhound-guesser
     ports:
       - "3000:3000"
   inference:
+    image: public.ecr.aws/n7b0m3g0/greyhound-guesser
     build:
       context: .
       dockerfile: inference.Dockerfile

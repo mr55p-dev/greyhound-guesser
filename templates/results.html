@@ -1,6 +1,4 @@
 <div>
-  <h1>Result</h1>
-  {{ range $i, $v := . }}
-  <p>Dog {{ $i }}: {{ $v }}</p>
-  {{ end }}
+  <h5>Result</h5>
+  <p>Dog {{ .Position }} (confidence {{ .Confidence }})</p>
 </div>

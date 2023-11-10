@@ -66,4 +66,7 @@ test-inference:
 	--data-urlencode 'dog-5-distance=1' \
 	--data-urlencode 'race-length=0.5'
 
+air:
+	INFERENCE_HOSTNAME=localhost:5000 air
+
 .PHONY = init clean-venv lab build run model-archive torch-server

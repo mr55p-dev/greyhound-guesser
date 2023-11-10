@@ -17,6 +17,11 @@ type FormControls struct {
 	TrapNumbers []int
 }
 
+type Result struct {
+	Position   int     `json:"position"`
+	Confidence float32 `json:"confidence"`
+}
+
 func ReadTemplate(data any, files ...string) string {
 	out := new(bytes.Buffer)
 	t := template.Must(
@@ -35,7 +40,7 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		c.Logger().Debug("Index request received")
 		html := ReadTemplate(
-			FormControls{TrapNumbers: []int{0, 1, 2, 3, 4, 5}},
+			FormControls{TrapNumbers: []int{1, 2, 3, 4, 5, 6}},
 			"templates/index.html",
 			"templates/common.html",
 		)
@@ -61,24 +66,24 @@ func main() {
 			bytes.NewReader(reqBody),
 		)
 		if err != nil {
+			c.Logger().Debugf("Failed to get inference: %s", err.Error())
 			return c.String(http.StatusInternalServerError, fmt.Sprintf("Failed to get inference: %s", err.Error()))
 		}
 
 		// Decode server response
 		c.Logger().Info("Received response from inference server")
 		defer res.Body.Close()
-		resData := new(bytes.Buffer)
-		io.Copy(resData, res.Body)
-		c.Logger().Debug("Copied response body")
+		resData, err := io.ReadAll(res.Body)
+		c.Logger().Debugf("Received response body: %s", string(resData))
 
 		// Render response
 		if res.StatusCode != 200 {
 			c.Logger().Warnf("Got bad response %s from inference server", res.Status)
-			return c.String(http.StatusInternalServerError, fmt.Sprintf("Error fetching inference: (%s) %s", res.Status, resData.String()))
+			return c.String(http.StatusInternalServerError, fmt.Sprintf("Error fetching inference: (%s) %s", res.Status, resData))
 		}
-		out := make([]float32, 5)
-		c.Logger().Debug("Trying to unmarshal response")
-		json.Unmarshal(resData.Bytes(), &out)
+		out := new(Result)
+		json.Unmarshal(resData, &out)
+		out.Confidence *= 100
 		c.Logger().Debugf("Received response from model server: %v", out)
 
 		html := ReadTemplate(
@@ -92,4 +97,3 @@ func main() {
 	e.Logger.SetLevel(0)
 	log.Fatal(e.Start(":3000"))
 }
-

@@ -7,14 +7,16 @@ import torch
 from src.utils import get_device
 from src.model import Network
 
+
 class BadFormError(werkzeug.exceptions.HTTPException):
     code = 400
     description = "Form is missing a required property"
 
-class Model():
+
+class Model:
     def __init__(self):
         self.device = get_device()
-        
+
         weight_path = os.getenv("TORCH_WEIGHT_PATH")
         if not weight_path:
             raise OSError("TORCH_WEIGHT_PATH environment variable is missing")
@@ -37,30 +39,35 @@ class Model():
                 form[field] = float(form[field])
         return form
 
-    def predict(self, form):
+    def predict(self, form) -> np.ndarray:
         form = self.sanitize(form)
         input = np.zeros((19, 1), dtype=np.float32)
         for idx, field in enumerate(fields):
             if type(form[field]) != float:
-                raise ValueError(f"Field {field} has invalid type {type(form[field])} (val: {form[field]})")
+                raise ValueError(
+                    f"Field {field} has invalid type {type(form[field])} (val: {form[field]})"
+                )
             input[idx, 0] = form[field]
 
         input = torch.tensor(input, device=self.device)
-        pred = self.model.forward(input.T)
+        pred = self.model.forward(input.T).detach().cpu().numpy()
         app.logger.info("Generated prediction")
         app.logger.info(pred)
         return pred
 
+
 labels = ["odds", "distance", "finished"]
-fields = ["race-length"] + [f"dog-{i}-{j}" for i in range(5) for j in labels] 
+fields = ["race-length"] + [f"dog-{i}-{j}" for i in range(5) for j in labels]
 
 model = Model()
 app = Flask(__name__)
 app.logger.info("Started app")
 
+
 @app.route("/health", methods=["GET"])
 def health():
     return f"Ok. Using model `{model.model_name}`."
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -73,8 +80,15 @@ def predict():
             raise BadFormError()
         form_fields[field] = request.form[field]
 
-    out = model.predict(form_fields)
+    out = model.predict(form_fields).reshape(-1)
     app.logger.debug("Generated predictions")
     app.logger.debug(out)
-    return out[0, :].tolist()
 
+    best = out.argmax().item()
+    confidence = out[best].item()
+    app.logger.info(f"Responding to prediction with {best} confidence: {confidence}")
+
+    return {
+        "position": best,
+        "confidence": confidence,
+    }
