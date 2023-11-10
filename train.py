@@ -42,9 +42,9 @@ def test_loop(dataloader, model, loss_func, epoch):
 
 def main():
     # Hyperparameters
-    batch_size = 16
+    batch_size = 32
     learning_rate = 1e-4
-    epochs = 500
+    epochs = 50000
 
     torch.manual_seed(1)
 
@@ -53,10 +53,11 @@ def main():
         project="greyhound-guesser",
         config={
             "learning_rate": learning_rate,
-            "architecture": "v0",
+            "architecture": "v0.1",
             "dataset": "crayford-races-v0",
             "epochs": epochs,
             "batch_size": batch_size,
+            "optimizer": "Adam",
         },
     )
     print("Starting training session")
