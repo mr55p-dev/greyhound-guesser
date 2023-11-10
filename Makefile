@@ -3,6 +3,9 @@ init:
 	python3 -m venv venv
 	venv/bin/python -m pip install -r requirements.txt
 
+get-latest:
+	@echo $(LATEST_MODEL)
+
 clean-venv:
 	rm -rf venv
 

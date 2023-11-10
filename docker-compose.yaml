@@ -17,4 +17,4 @@ services:
       - "5000:5000"
     environment:
       FLASK_DEBUG: true
-      TORCH_WEIGHT_PATH: /app/models/gg-2023-11-10_10-20.pt
+      TORCH_WEIGHT_PATH: /app/models/gg-2023-11-10_15-17.pt

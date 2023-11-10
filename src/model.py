@@ -6,7 +6,7 @@ class Network(nn.Module):
     GLOBAL_FEATURES = 1
     LAYER_1_NODES = 256
     LAYER_2_NODES = 128
-    LAYER_3_NODES = 32
+    LAYER_3_NODES = 128
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
