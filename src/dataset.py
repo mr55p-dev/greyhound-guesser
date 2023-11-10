@@ -18,7 +18,7 @@ class GreyhoundDataset(Dataset):
         data = pd.read_csv(data)
         data["Odds"] = 1 / data["Odds"]
         data["Distance_Recent"] = data["Distance_Recent"] / 1000
-        data["Finish_Recent"] = (6 - data["Finish_Recent"]) / 5
+        data["Finish_Recent"] = (6 - data["Finish_Recent"].clip(lower=1, upper=6)) / 5
         all_cols = ["Odds", "Distance_Recent", "Finish_Recent", "Finished"]
         feature_cols = ["Odds", "Distance_Recent", "Finish_Recent"]
 
