@@ -5,6 +5,8 @@ from torch.utils.data import Dataset
 import pandas as pd
 from pathlib import Path
 
+# Params
+BATCH_SIZE = 32
 
 class GreyhoundDataset(Dataset):
     LABEL_COL = "Winner"

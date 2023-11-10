@@ -7,7 +7,7 @@ from torch.utils.data.dataset import random_split
 from tqdm import tqdm, trange
 import wandb
 from src.model import Network
-from src.dataset import GreyhoundDataset
+from src.dataset import GreyhoundDataset, BATCH_SIZE
 from src.utils import get_device
 from src.metrics import Accuracy, Metric
 
@@ -65,7 +65,6 @@ def test_loop(dataloader, model, loss_func, epoch, metrics: list[Metric] = []):
 
 def main():
     # Hyperparameters
-    batch_size = 32
     learning_rate = 1e-4
     epochs = 50
 
@@ -79,7 +78,7 @@ def main():
             "architecture": "v0.1",
             "dataset": "crayford-races-v0",
             "epochs": epochs,
-            "batch_size": batch_size,
+            "batch_size": BATCH_SIZE,
             "optimizer": "Adam",
         },
     )
@@ -91,8 +90,8 @@ def main():
     # Data load
     dataset = GreyhoundDataset(device)
     train_set, test_set = random_split(dataset, [0.9, 0.1])
-    train = DataLoader(train_set, batch_size, shuffle=True)
-    test = DataLoader(test_set, batch_size, shuffle=True)
+    train = DataLoader(train_set, BATCH_SIZE, shuffle=True)
+    test = DataLoader(test_set, BATCH_SIZE, shuffle=True)
 
     # Model load
     model = Network().to(device)
