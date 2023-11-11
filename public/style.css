@@ -24,17 +24,29 @@ html {
   color: var(--text);
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, ol, ul {
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ol,
+ul {
   margin: 0;
   padding: 0;
   font-weight: normal;
 }
 
-ol, ul {
+ol,
+ul {
   list-style: none;
 }
 
@@ -44,42 +56,58 @@ img {
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: "BIZ UDPMincho";
   font-weight: 400;
+  padding: 0.25rem;
 }
 
-h1, h2, h3, h4, h5 {
-  font-family: 'Poppins', sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: "BIZ UDPMincho";
   font-weight: 700;
 }
 
-h1 {font-size: 4.210rem; /* 67.36px */}
+html {
+  font-size: 100%;
+} /* 16px */
 
-h2 {font-size: 3.158rem; /* 50.56px */}
+h1 {
+  font-size: 3.053rem; /* 48.8px */
+}
 
-h3 {font-size: 2.369rem; /* 37.92px */}
+h2 {
+  font-size: 2.442rem; /* 39.04px */
+}
 
-h4 {font-size: 1.777rem; /* 28.48px */}
+h3 {
+  font-size: 1.954rem; /* 31.2px */
+}
 
-h5 {font-size: 1.333rem; /* 21.28px */}
+h4 {
+  font-size: 1.563rem; /* 24.96px */
+}
 
-small {font-size: 0.750rem; /* 12px */}
+h5 {
+  font-size: 1.25rem; /* 20px */
+}
 
-body {
-	padding: 0.25rem;
+small {
+  font-size: 0.8rem; /* 12.8px */
 }
 
 section {
-	margin-top: 1rem;
-	padding: 0.2rem;
+  margin-top: 1rem;
+  padding: 0.2rem;
 }
 
 #form-wrap {
-	display: flex;
-	flex-direction: column;
-	gap: 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
 .dog {
-
 }
