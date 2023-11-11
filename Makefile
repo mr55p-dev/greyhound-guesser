@@ -43,6 +43,12 @@ docker-build-server:
 		-t gg-server \
 		.
 
+build-platform-images:
+	docker build -t public.ecr.aws/n7b0m3g0/greyhound-guesser/server:amd64 -f server.Dockerfile --platform linux/amd64 .
+	docker build -t public.ecr.aws/n7b0m3g0/greyhound-guesser/inference:amd64 -f inference.Dockerfile --platform linux/amd64 .
+	docker image push public.ecr.aws/n7b0m3g0/greyhound-guesser/server:amd64 
+	docker image push public.ecr.aws/n7b0m3g0/greyhound-guesser/inference:amd64 
+
 test-inference:
 	curl --location 'http://127.0.0.1:5000/predict' \
 	--header 'Content-Type: application/x-www-form-urlencoded' \
